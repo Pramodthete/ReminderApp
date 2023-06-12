@@ -1,0 +1,16 @@
+package com.spring.service;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ReminderService {
+
+    @Scheduled(cron = "0 0 9 * * ?") // Execute every day at 9:00 AM
+    public void sendReminders() {
+    	
+        // Send reminders logic...
+    	System.out.println("Reminder send successfully");
+    }
+
+}

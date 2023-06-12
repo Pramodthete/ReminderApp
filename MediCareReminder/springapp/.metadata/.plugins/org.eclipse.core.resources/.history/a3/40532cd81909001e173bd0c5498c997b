@@ -1,0 +1,108 @@
+package com.spring.controllers;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.spring.dao.ReminderDao;
+import com.spring.pojos.Reminder;
+import com.spring.service.ReminderService;
+
+@CrossOrigin
+@RestController
+@RequestMapping("/api/reminders")
+public class ReminderController {
+
+    private final ReminderService reminderService;
+    
+    
+    private final ReminderDao reminderRepository;
+
+    @Autowired
+    public ReminderController(ReminderDao reminderRepository) {
+        this.reminderService = new ReminderService();
+		this.reminderRepository = reminderRepository;
+    }
+
+    // Get all reminders
+    @GetMapping
+    public List<Reminder> getAllReminders() {
+        return reminderRepository.findAll();
+    }
+
+    // Get a single reminder by ID
+    @GetMapping("/{id}")
+    public Reminder getReminderById(@PathVariable Long id) throws NotFoundException {
+        return reminderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException());
+    }
+
+    // Create a new reminder
+    @PostMapping
+    public Reminder createReminder(@RequestBody Reminder reminder) {
+        return reminderRepository.save(reminder);
+    }
+
+    // Update a reminder
+    @PutMapping("/{id}")
+    public Reminder updateReminder(@PathVariable Long id, @RequestBody Reminder updatedReminder) throws NotFoundException {
+        Reminder existingReminder = reminderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException());
+
+        existingReminder.setReminderText(updatedReminder.getReminderText());
+        existingReminder.setUser(updatedReminder.getUser());
+
+        return reminderRepository.save(existingReminder);
+    }
+
+    // Delete a reminder
+    @DeleteMapping("/{id}")
+    public void deleteReminder(@PathVariable Long id) throws NotFoundException {
+        if (!reminderRepository.existsById(id)) {
+            throw new NotFoundException();
+        }
+
+        reminderRepository.deleteById(id);
+    }
+    
+    
+    
+    // These all are reminders................
+
+    @Autowired
+    public ReminderController(ReminderService reminderService) {
+        this.reminderService = reminderService;
+		this.reminderRepository = null;
+    }
+
+    @Scheduled(cron = "0 0 8 * * *") // Trigger at 8 AM every day for breakfast reminder
+    public void sendBreakfastReminder() {
+        reminderService.sendReminder("Breakfast");
+    }
+
+    @Scheduled(cron = "0 0 12 * * *") // Trigger at 12 PM every day for lunch reminder
+    public void sendLunchReminder() {
+        reminderService.sendReminder("Lunch");
+    }
+
+    @Scheduled(cron = "0 0 18 * * *") // Trigger at 6 PM every day for dinner reminder
+    public void sendDinnerReminder() {
+        reminderService.sendReminder("Dinner");
+    }
+
+    @Scheduled(cron = "0 0 9 * * *") // Trigger at 9 AM every day for medication reminder
+    public void sendMedicationReminder() {
+        reminderService.sendReminder("Medication");
+    }
+}

@@ -1,0 +1,10 @@
+package com.spring.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class ReminderService {
+	public void sendReminder(String reminderType) {
+        System.out.println("Sending " + reminderType + " reminder to the user");
+    }
+}

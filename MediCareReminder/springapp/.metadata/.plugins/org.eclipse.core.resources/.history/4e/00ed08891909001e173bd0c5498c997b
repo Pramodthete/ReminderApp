@@ -1,0 +1,42 @@
+package com.spring.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.spring.service.ReminderService;
+
+@CrossOrigin
+@RestController
+@RequestMapping("/api/reminders")
+public class ReminderController {
+
+    private final ReminderService reminderService;
+
+    @Autowired
+    public ReminderController(ReminderService reminderService) {
+        this.reminderService = reminderService;
+    }
+
+    @Scheduled(cron = "0 0 8 * * *") // Trigger at 8 AM every day for breakfast reminder
+    public void sendBreakfastReminder() {
+        reminderService.sendReminder("Breakfast");
+    }
+
+    @Scheduled(cron = "0 0 12 * * *") // Trigger at 12 PM every day for lunch reminder
+    public void sendLunchReminder() {
+        reminderService.sendReminder("Lunch");
+    }
+
+    @Scheduled(cron = "0 0 18 * * *") // Trigger at 6 PM every day for dinner reminder
+    public void sendDinnerReminder() {
+        reminderService.sendReminder("Dinner");
+    }
+
+    @Scheduled(cron = "0 0 9 * * *") // Trigger at 9 AM every day for medication reminder
+    public void sendMedicationReminder() {
+        reminderService.sendReminder("Medication");
+    }
+}
